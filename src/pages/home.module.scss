@@ -1,1 +1,46 @@
-// TODO
+.homeContainer {
+  max-width: 1120px;
+
+  margin: 0 auto;
+}
+
+.posts {
+  display: flex;
+  flex-direction: column;
+
+  a {
+    strong {
+      font-size: 1.75rem;
+    }
+
+    > p {
+      font-size: 1.125rem;
+
+      margin: 0.5rem 0 1.5rem 0;
+    }
+
+    > div {
+      display: flex;
+
+      font-size: 0.875rem;
+      color: var(--info);
+
+      div {
+        display: flex;
+        align-items: center;
+      }
+
+      time, span {
+        margin-left: 0.5rem;
+      }
+
+      div + div {
+        margin-left: 1.5rem;
+      }
+    }
+
+    & + a {
+      margin-top: 3rem;
+    }
+  }
+}
