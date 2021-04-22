@@ -44,3 +44,18 @@
     }
   }
 }
+
+.buttonLoadMore {
+  font-weight: 600;
+  font-size: 1.125rem;
+  margin: 4rem 0 2rem;
+
+  background: transparent;
+  border: 0;
+  color: var(--highlight);
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}

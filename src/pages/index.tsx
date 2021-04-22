@@ -1,7 +1,13 @@
 import { GetStaticProps } from 'next';
+import Link from 'next/link';
+import Head from 'next/head';
 import Prismic from '@prismicio/client';
+import { useState } from 'react';
+import { format } from 'date-fns';
+import ptBR from 'date-fns/locale/pt-BR';
 import { FiCalendar, FiUser } from 'react-icons/fi';
 
+import Header from '../components/Header';
 import { getPrismicClient } from '../services/prismic';
 
 import commonStyles from '../styles/common.module.scss';
@@ -27,53 +33,94 @@ interface HomeProps {
 }
 
 export default function Home({ postsPagination }: HomeProps) {
-  console.log({ postsPagination });
+  const [posts, setPosts] = useState(postsPagination.results);
+  const [nextPage, setNextPage] = useState(postsPagination.next_page);
+
+  async function handleLoadMorePosts() {
+    const response = await fetch(postsPagination.next_page);
+    const data: PostPagination = await response.json();
+
+    const newPosts = data.results;
+
+    setNextPage(data.next_page);
+    setPosts(oldState => [...oldState, ...newPosts]);
+  }
 
   return (
-    <main className={styles.homeContainer}>
-      <div className={styles.posts}>
-        <a>
-          <strong>Developing SSG using Node</strong>
-          <p>
-            The complete title should Developing Static Site Generator using
-            NodeJS.
-          </p>
-          <div>
-            <div>
-              <FiCalendar size="0.875rem" />
-              <time>15 Mar 2021</time>
-            </div>
-            <div>
-              <FiUser size="0.875rem" />
-              <span>Elian Becali</span>
-            </div>
-          </div>
-        </a>
-      </div>
-    </main>
+    <>
+      <Head>
+        <title>Home | spacetraveling</title>
+      </Head>
+
+      <Header />
+
+      <main className={styles.homeContainer}>
+        <div className={styles.posts}>
+          {posts.map(post => (
+            <Link href={`/post/${post.uid}`} key={post.uid}>
+              <a>
+                <strong>{post.data.title}</strong>
+                <p>{post.data.subtitle}</p>
+                <div>
+                  <div>
+                    <FiCalendar size="0.875rem" />
+                    <time>
+                      {format(new Date(post.first_publication_date), 'PP', {
+                        locale: ptBR,
+                      })}
+                    </time>
+                  </div>
+                  <div>
+                    <FiUser size="0.875rem" />
+                    <span>{post.data.author}</span>
+                  </div>
+                </div>
+              </a>
+            </Link>
+          ))}
+        </div>
+        {nextPage && (
+          <button
+            type="button"
+            className={styles.buttonLoadMore}
+            onClick={handleLoadMorePosts}
+          >
+            Carregar mais posts
+          </button>
+        )}
+      </main>
+    </>
   );
 }
 
-// export const getStaticProps: GetStaticProps = async () => {
-//   const prismic = getPrismicClient();
-//   const postsResponse = await prismic.query(
-//     [Prismic.predicates.at('document.type', 'posts')],
-//     {
-//       fetch: ['posts.author', 'posts.title', 'posts.subtitle', 'posts.slug'],
-//       pageSize: 2,
-//     }
-//   );
+export const getStaticProps: GetStaticProps = async () => {
+  const prismic = getPrismicClient();
+  const postsResponse = await prismic.query(
+    [Prismic.predicates.at('document.type', 'posts')],
+    {
+      pageSize: 2,
+    }
+  );
 
-//   const postsPagination = {
-//     next_page: postsResponse.next_page,
-//     results: postsResponse.results,
-//   };
+  const postsPagination = {
+    next_page: postsResponse.next_page,
+    results: postsResponse.results.map(post => {
+      return {
+        uid: post.uid,
+        data: {
+          title: post.data.title,
+          subtitle: post.data.subtitle,
+          author: post.data.author,
+        },
+        first_publication_date: post.first_publication_date,
+      };
+    }),
+  };
 
-//   console.log({ postsPagination });
-
-//   return {
-//     props: {
-//       postsPagination,
-//     },
-//   };
-// };
+  return {
+    props: {
+      postsPagination,
+    },
+    revalidate: 60 * 60, // 1 hour
+  };
+};
