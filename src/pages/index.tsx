@@ -10,7 +10,7 @@ import { FiCalendar, FiUser } from 'react-icons/fi';
 import Header from '../components/Header';
 import { getPrismicClient } from '../services/prismic';
 
-import commonStyles from '../styles/common.module.scss';
+// import commonStyles from '../styles/common.module.scss';
 import styles from './home.module.scss';
 
 interface Post {
