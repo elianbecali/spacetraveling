@@ -1,11 +1,14 @@
 import { GetStaticPaths, GetStaticProps } from 'next';
 import Head from 'next/head';
+import Prismic from '@prismicio/client';
 import { format } from 'date-fns';
 import ptBR from 'date-fns/locale/pt-BR';
 import { FiCalendar, FiClock, FiUser } from 'react-icons/fi';
 
 import { RichText } from 'prismic-dom';
 import { Fragment } from 'react';
+import { useRouter } from 'next/router';
+
 import Header from '../../components/Header';
 import { getPrismicClient } from '../../services/prismic';
 
@@ -34,6 +37,23 @@ interface PostProps {
 }
 
 export default function Post({ post }: PostProps) {
+  const router = useRouter();
+
+  const totalWords = post.data.content.reduce((total, contentItem) => {
+    total += contentItem.heading.split(' ').length;
+
+    const words = RichText.asText(contentItem.body).split(' ').length;
+    total += words;
+
+    return total;
+  }, 0);
+
+  const readingTime = Math.ceil(totalWords / 200);
+
+  if (router.isFallback) {
+    return <h1>Carregando...</h1>;
+  }
+
   return (
     <>
       <Head>
@@ -66,7 +86,7 @@ export default function Post({ post }: PostProps) {
             </div>
             <div>
               <FiClock size="1.25rem" />
-              <span>4 min</span>
+              <span>{readingTime} min</span>
             </div>
           </div>
 
@@ -90,12 +110,20 @@ export default function Post({ post }: PostProps) {
 }
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  // const prismic = getPrismicClient();
-  // const posts = await prismic.query();
+  const prismic = getPrismicClient();
+  const posts = await prismic.query([
+    Prismic.predicates.at('document.type', 'posts'),
+  ]);
+
+  const paths = posts.results.map(post => ({
+    params: {
+      slug: post.uid,
+    },
+  }));
 
   return {
-    paths: [],
-    fallback: 'blocking',
+    paths,
+    fallback: true,
   };
 };
 
@@ -105,21 +133,9 @@ export const getStaticProps: GetStaticProps = async context => {
   const prismic = getPrismicClient();
   const response = await prismic.getByUID('posts', String(slug), {});
 
-  const post = {
-    first_publication_date: response.first_publication_date,
-    data: {
-      title: response.data.title,
-      banner: response.data.banner,
-      author: response.data.author,
-      content: response.data.content.map(postContent => ({
-        heading: postContent.heading,
-        body: postContent.body,
-      })),
-    },
-  };
   return {
     props: {
-      post,
+      post: response,
     },
     revalidate: 60 * 60, // 1hour
   };
