@@ -10,6 +10,7 @@ import { Fragment } from 'react';
 import { useRouter } from 'next/router';
 
 import Header from '../../components/Header';
+import { Comments } from '../../components/Comments';
 import { getPrismicClient } from '../../services/prismic';
 
 // import commonStyles from '../../styles/common.module.scss';
@@ -104,6 +105,8 @@ export default function Post({ post }: PostProps) {
             ))}
           </div>
         </article>
+
+        <Comments />
       </main>
     </>
   );
