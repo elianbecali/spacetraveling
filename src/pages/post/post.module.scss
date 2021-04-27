@@ -9,6 +9,7 @@
 .container {
   max-width: 1120px;
 
+  padding: 0 8rem;
   margin: 0 auto;
 
   @media (max-width: 1120px) {
@@ -23,6 +24,7 @@
   .postDetail {
     margin-top: 1.5rem;
     display: flex;
+    flex-wrap: wrap;
 
     font-size: 0.875rem;
     color: var(--info);
@@ -38,6 +40,18 @@
 
     div + div {
       margin-left: 1.5rem;
+    }
+
+    @media (max-width: 366px) {
+      // div:last-child {
+      //   display: block;
+      //   margin-top: 1.5rem;
+      //   margin-left: 0;
+      // }
+
+      div + div {
+        margin-left: 1rem;
+      }
     }
 
     div:last-child span{
