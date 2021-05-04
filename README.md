@@ -1,5 +1,5 @@
 <h1 align="center">
-			<img src="https://raw.githubusercontent.com/elianbecali/spacetraveling/main/.github/Logo.svg" alt="spacetraveling logo" />
+			<img src="https://raw.githubusercontent.com/elianbecali/spacetraveling/master/.github/Logo.svg" alt="spacetraveling logo" />
 </h1>
 
 <h3 align="center">
@@ -71,7 +71,7 @@ O layout da aplicação está disponível no Figma:
 </a>
 
 <p align="center" style="display: flex; align-items: flex-start; justify-content: center;">
-  <img alt="ignews" title="#ignews" src="https://github.com/elianbecali/spacetraveling/blob/main/.github/Macbook-Pro.png?raw=true" />
+  <img alt="ignews" title="#ignews" src="https://github.com/elianbecali/spacetraveling/blob/master/.github/Macbook-Pro.png?raw=true" />
 </p>
 
 ---
